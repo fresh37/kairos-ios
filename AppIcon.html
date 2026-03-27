@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 1024px;
+      height: 1024px;
+      overflow: hidden;
+    }
+
+    /*
+      Checkpoint — App Icon  v2
+      1024 × 1024 px · screenshot and drop into Xcode AppIcon appiconset
+
+      Changes from v1:
+        - Orb scaled up: 628px → 750px (73% of canvas)
+        - Luminosity baked into gradient: center pushed to near-white (#f4f9ff)
+          so the bright core is intrinsic to the orb shape at all render sizes
+        - Steep falloff from core to saturated blue by 20% → reads at 60pt
+        - Edge deepened (#2868b8) for more contrast across the full range
+        - All large atmospheric box-shadows removed (didn't survive < 500px)
+        - One tight edge-softening shadow retained (~6px at home screen size)
+        - Ambient spill removed (was imperceptible; earned nothing)
+    */
+
+    .canvas {
+      width: 1024px;
+      height: 1024px;
+      background: #0f1923;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .orb {
+      position: relative;
+      width: 750px;
+      height: 750px;
+      border-radius: 50%;
+
+      /*
+        Gradient center at (42%, 36%) matches BreathingOrbView.swift exactly.
+        Core is near-white so the "light source" quality is intrinsic to the
+        orb shape — not dependent on external shadow.
+        At 120px home screen render, the bright core vs deep blue edge gives
+        enough luminance contrast to read as a glowing sphere, not a flat disc.
+      */
+      background: radial-gradient(
+        circle at 42% 36%,
+        #f4f9ff 0%,
+        #cce5f8 12%,
+        #9ecded 26%,
+        #68aedd 52%,
+        #4592cc 76%,
+        #2868b8 100%
+      );
+
+      /*
+        Single tight shadow — at 120px this compresses to ~6px blur / ~1px spread,
+        which reads as a soft blue halo at home screen size. Subtle but present.
+      */
+      box-shadow: 0 0 48px 10px rgba(120, 170, 240, 0.30);
+    }
+
+    /*
+      Rim shadow — lower-right darkening for spherical depth.
+      Without this the orb reads as a flat disc at any size.
+    */
+    .orb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 65% 70%,
+        transparent 42%,
+        rgba(6, 12, 24, 0.22) 100%
+      );
+    }
+  </style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="orb"></div>
+  </div>
+</body>
+</html>
