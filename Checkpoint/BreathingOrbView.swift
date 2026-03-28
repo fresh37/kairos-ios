@@ -87,6 +87,9 @@ struct BreathingOrbView: View {
 
     private func startCycle() {
         breathTask?.cancel()
+        // Snap orb back to resting state so every cycle starts clean
+        withAnimation(.none) { isExpanded = false }
+        phase = .holdOut
         breathTask = Task { @MainActor in
             while !Task.isCancelled {
                 // Inhale: expand
