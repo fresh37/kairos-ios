@@ -116,10 +116,9 @@ struct SettingsDrawer: View {
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .presentationBackground(Color.appBackground)
-        .onAppear {
-            UNUserNotificationCenter.current().getNotificationSettings { s in
-                DispatchQueue.main.async { notifStatus = s.authorizationStatus }
-            }
+        .task {
+            let s = await UNUserNotificationCenter.current().notificationSettings()
+            notifStatus = s.authorizationStatus
         }
         // Validate and sync to parent binding on every draft change.
         .onChange(of: draft) { _, _ in
@@ -257,14 +256,11 @@ struct SettingsDrawer: View {
                 openURL(url)
             }
         default: // .notDetermined
-            UNUserNotificationCenter.current().requestAuthorization(
-                options: [.alert, .sound, .badge]
-            ) { granted, _ in
-                DispatchQueue.main.async {
-                    notifStatus = granted ? .authorized : .denied
-                    if granted {
-                        draft.notificationsEnabled = true
-                    }
+            Task {
+                let granted = (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])) ?? false
+                notifStatus = granted ? .authorized : .denied
+                if granted {
+                    draft.notificationsEnabled = true
                 }
             }
         }

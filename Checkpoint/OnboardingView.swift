@@ -154,17 +154,13 @@ struct OnboardingView: View {
 
     private func requestPermissionAndFinish() {
         isRequesting = true
-        UNUserNotificationCenter.current().requestAuthorization(
-            options: [.alert, .sound, .badge]
-        ) { granted, _ in
-            // Fires on a background thread — hop back to main before touching state/UI.
-            DispatchQueue.main.async {
-                if granted {
-                    NotificationScheduler.scheduleNotifications(prefs: prefs)
-                    showWelcome = true
-                }
-                isComplete = true
+        Task {
+            let granted = (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])) ?? false
+            if granted {
+                NotificationScheduler.scheduleNotifications(prefs: prefs)
+                showWelcome = true
             }
+            isComplete = true
         }
     }
 }

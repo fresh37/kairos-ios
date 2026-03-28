@@ -141,10 +141,9 @@ struct MainTabView: View {
     // MARK: - Helpers
 
     private func checkNotificationStatus() {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            DispatchQueue.main.async {
-                notifStatus = settings.authorizationStatus
-            }
+        Task {
+            let settings = await UNUserNotificationCenter.current().notificationSettings()
+            notifStatus = settings.authorizationStatus
         }
     }
 }
