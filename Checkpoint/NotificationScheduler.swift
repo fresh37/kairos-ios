@@ -49,17 +49,25 @@ enum NotificationScheduler {
     }
 
     static func buildMessagePool(prefs: Preferences, count: Int) -> [String] {
-        let buckets: [String: [String]] = [
+        var buckets: [String: [String]] = [
             "gratitude":     MessagePool.gratitude,
             "bodyAwareness": MessagePool.bodyAwareness,
             "presentMoment": MessagePool.presentMoment,
         ]
 
+        if prefs.customMessagesEnabled, !prefs.customMessages.isEmpty {
+            buckets["custom"] = prefs.customMessages
+        }
+
         var active: [String] = []
         if prefs.gratitude     { active.append("gratitude") }
         if prefs.bodyAwareness { active.append("bodyAwareness") }
         if prefs.presentMoment { active.append("presentMoment") }
-        if active.isEmpty      { active = Array(buckets.keys) }
+        if prefs.customMessagesEnabled, !prefs.customMessages.isEmpty {
+            active.append("custom")
+        }
+        // Fallback: all built-in buckets if nothing is active
+        if active.isEmpty { active = ["gratitude", "bodyAwareness", "presentMoment"] }
 
         let perCategory = Int(ceil(Double(count) / Double(active.count)))
         var pool: [String] = []

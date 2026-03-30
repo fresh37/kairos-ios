@@ -55,6 +55,8 @@ struct Preferences: Codable, Equatable {
     var meditationEndHour: Int = 21
     var activeDays: Set<Int> = Set(1...7)
     var themeID: String = "midnight"
+    var customMessages: [String] = []
+    var customMessagesEnabled: Bool = false
 
     // MARK: - Validation
 

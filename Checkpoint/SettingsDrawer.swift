@@ -18,6 +18,7 @@ struct SettingsDrawer: View {
     @State private var draft: Preferences
     @State private var notifStatus: UNAuthorizationStatus = .notDetermined
     @State private var showAppearance = false
+    @State private var showCustomMessages = false
     @Environment(\.appTheme) private var theme
     @Environment(\.openURL) private var openURL
 
@@ -98,6 +99,29 @@ struct SettingsDrawer: View {
                             toggleRow(label: "Present Moment", isOn: $draft.presentMoment)
                         }
 
+                        // Custom Messages
+                        SettingsGroup(label: "Custom Messages") {
+                            Button {
+                                showCustomMessages = true
+                            } label: {
+                                HStack {
+                                    Text("My Messages")
+                                        .font(.system(size: 17, weight: .regular))
+                                        .foregroundStyle(theme.textPrimary)
+                                    Spacer()
+                                    Text(draft.customMessages.isEmpty ? "None" : "\(draft.customMessages.count)")
+                                        .font(.system(size: 17, weight: .regular))
+                                        .foregroundStyle(theme.textMuted)
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundStyle(theme.textMuted)
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 13)
+                            }
+                            .buttonStyle(.plain)
+                        }
+
                         // Meditation
                         SettingsGroup(label: "Meditation") {
                             toggleRow(label: "Enable", isOn: $draft.meditationEnabled)
@@ -143,6 +167,13 @@ struct SettingsDrawer: View {
         .presentationBackground(theme.background)
         .sheet(isPresented: $showAppearance) {
             AppearanceSheet(selectedThemeID: $draft.themeID)
+        }
+        .sheet(isPresented: $showCustomMessages) {
+            CustomMessagesSheet(
+                messages: $draft.customMessages,
+                isEnabled: $draft.customMessagesEnabled
+            )
+            .environment(\.appTheme, AppTheme.theme(for: draft.themeID))
         }
         .task {
             let s = await UNUserNotificationCenter.current().notificationSettings()
