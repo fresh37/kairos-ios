@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct GoalCompletedView: View {
     let goal: HabitGoal

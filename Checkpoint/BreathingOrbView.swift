@@ -66,29 +66,14 @@ struct BreathingOrbView: View {
                     .frame(width: 160, height: 160)
 
                 if theme.yarnBall {
-                    let accent = theme.accentLight
-                    let rim    = theme.orbRim
-                    Canvas { context, size in
-                        context.clip(to: Path(ellipseIn: CGRect(origin: .zero, size: size)))
-                        let cx = size.width / 2, cy = size.height / 2
-                        let r  = size.width / 2, b  = r * 0.35
-                        for i in 0..<7 {
-                            let theta = Double(i) * .pi / 7.0 + yarnRotation * .pi / 180
-                            var path = Path()
-                            for step in 0...80 {
-                                let t = Double(step) / 80.0 * 2 * .pi
-                                let x = r * cos(t) * cos(theta) - b * sin(t) * sin(theta) + cx
-                                let y = r * cos(t) * sin(theta) + b * sin(t) * cos(theta) + cy
-                                if step == 0 { path.move(to: CGPoint(x: x, y: y)) }
-                                else         { path.addLine(to: CGPoint(x: x, y: y)) }
-                            }
-                            path.closeSubpath()
-                            let color = i % 2 == 0 ? accent.opacity(0.52) : rim.opacity(0.48)
-                            context.stroke(path, with: .color(color), lineWidth: 2.5)
-                        }
-                    }
-                    .frame(width: 160, height: 160)
-                    .allowsHitTesting(false)
+                    Image("yarn-ball")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 160, height: 160)
+                        .scaleEffect(1.45)
+                        .clipShape(Circle())
+                        .rotationEffect(.degrees(yarnRotation))
+                        .allowsHitTesting(false)
                 }
             }
             // Inner glow: 60px → 30pt radius  |  expanded: 90px → 45pt
@@ -124,7 +109,7 @@ struct BreathingOrbView: View {
     private func startYarnRotation() {
         guard theme.yarnBall else { return }
         withAnimation(.none) { yarnRotation = 0 }
-        withAnimation(.linear(duration: 25).repeatForever(autoreverses: false)) {
+        withAnimation(.linear(duration: 90).repeatForever(autoreverses: false)) {
             yarnRotation = 360
         }
     }

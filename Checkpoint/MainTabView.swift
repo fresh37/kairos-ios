@@ -88,6 +88,7 @@ struct MainTabView: View {
                 }
             }
             .animation(.easeInOut(duration: 0.4), value: sessionActive)
+            .toolbar(sessionActive ? .hidden : .visible, for: .tabBar)
             .sheet(isPresented: $showPatternSheet) {
                 BreathingPatternSheet(pattern: $prefs.breathingPattern)
                     .presentationDetents([.medium, .large])
@@ -136,7 +137,7 @@ struct MainTabView: View {
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 0) {
                         // Denied state — quiet, tappable, stacked above timer button
-                        if notifStatus == .denied {
+                        if notifStatus == .denied && !sessionActive {
                             Button {
                                 if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
                                     openURL(url)
@@ -156,9 +157,14 @@ struct MainTabView: View {
                         }
 
                         Button {
-                            showTimerSheet = true
+                            if sessionActive {
+                                stopSession()
+                            } else {
+                                showTimerSheet = true
+                            }
                         } label: {
-                            Image(systemName: "timer")
+                            Image(systemName: sessionActive ? "xmark" : "timer")
+                                .contentTransition(.symbolEffect(.replace))
                                 .font(.system(size: 22, weight: .light))
                                 .foregroundColor(.white.opacity(sessionActive ? 0.65 : 0.45))
                                 .padding(28)
@@ -169,17 +175,20 @@ struct MainTabView: View {
 
                     Spacer()
 
-                    Button {
-                        showSettings = true
-                        hasOpenedSettings = true
-                    } label: {
-                        Image(systemName: "gear")
-                            .font(.system(size: 22, weight: .light))
-                            .foregroundColor(.white.opacity(hasOpenedSettings ? 0.45 : 0.65))
-                            .padding(28)
+                    if !sessionActive {
+                        Button {
+                            showSettings = true
+                            hasOpenedSettings = true
+                        } label: {
+                            Image(systemName: "gear")
+                                .font(.system(size: 22, weight: .light))
+                                .foregroundColor(.white.opacity(hasOpenedSettings ? 0.45 : 0.65))
+                                .padding(28)
+                        }
+                        .accessibilityLabel("Settings")
+                        .animation(.easeInOut(duration: 0.6), value: hasOpenedSettings)
+                        .transition(.opacity)
                     }
-                    .accessibilityLabel("Settings")
-                    .animation(.easeInOut(duration: 0.6), value: hasOpenedSettings)
                 }
             }
         }
@@ -246,6 +255,16 @@ struct MainTabView: View {
             sessionPatternOverride = nil
             sessionActive = true
         }
+    }
+
+    private func stopSession() {
+        sessionTask?.cancel()
+        sessionTask = nil
+        sessionActive = false
+        sessionPatternOverride = nil
+        sessionRemainingSeconds = 0
+        sessionBellIntervalSeconds = nil
+        secondsSinceLastBell = 0
     }
 
     private func playBell() {

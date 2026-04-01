@@ -90,29 +90,13 @@ private struct ThemeCard: View {
                             .shadow(color: theme.glowColor.opacity(0.12), radius: 20)
 
                         if theme.yarnBall {
-                            let accent = theme.accentLight
-                            let rim    = theme.orbRim
-                            Canvas { context, size in
-                                context.clip(to: Path(ellipseIn: CGRect(origin: .zero, size: size)))
-                                let cx = size.width / 2, cy = size.height / 2
-                                let r  = size.width / 2, b  = r * 0.35
-                                for i in 0..<7 {
-                                    let theta = Double(i) * .pi / 7.0
-                                    var path = Path()
-                                    for step in 0...60 {
-                                        let t = Double(step) / 60.0 * 2 * .pi
-                                        let x = r * cos(t) * cos(theta) - b * sin(t) * sin(theta) + cx
-                                        let y = r * cos(t) * sin(theta) + b * sin(t) * cos(theta) + cy
-                                        if step == 0 { path.move(to: CGPoint(x: x, y: y)) }
-                                        else         { path.addLine(to: CGPoint(x: x, y: y)) }
-                                    }
-                                    path.closeSubpath()
-                                    let color = i % 2 == 0 ? accent.opacity(0.52) : rim.opacity(0.48)
-                                    context.stroke(path, with: .color(color), lineWidth: 0.9)
-                                }
-                            }
-                            .frame(width: 48, height: 48)
-                            .allowsHitTesting(false)
+                            Image("yarn-ball")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 48, height: 48)
+                                .scaleEffect(1.45)
+                                .clipShape(Circle())
+                                .allowsHitTesting(false)
                         }
                     }
                     Spacer()
