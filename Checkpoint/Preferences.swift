@@ -65,8 +65,8 @@ struct Preferences: Codable, Equatable {
     /// Returns true if the current values satisfy all constraints.
     var isValid: Bool {
         guard (1...50).contains(remindersPerDay) else { return false }
-        guard (5...23).contains(startHour) else { return false }
-        guard (6...24).contains(endHour) else { return false }
+        guard (1...23).contains(startHour) else { return false }
+        guard (2...24).contains(endHour) else { return false }
         guard endHour > startHour else { return false }
         let windowMinutes = (endHour - startHour) * 60
         guard windowMinutes / remindersPerDay >= 15 else { return false }
@@ -86,8 +86,8 @@ struct Preferences: Codable, Equatable {
     func validated() -> Preferences {
         var copy = self
         if !(1...50).contains(copy.remindersPerDay) { copy.remindersPerDay = 3 }
-        if !(5...23).contains(copy.startHour) { copy.startHour = 9 }
-        if !(6...24).contains(copy.endHour) { copy.endHour = 21 }
+        if !(1...23).contains(copy.startHour) { copy.startHour = 9 }
+        if !(2...24).contains(copy.endHour) { copy.endHour = 21 }
         if copy.endHour <= copy.startHour { copy.endHour = copy.startHour + 1 }
         let windowMinutes = (copy.endHour - copy.startHour) * 60
         while windowMinutes / copy.remindersPerDay < 15, copy.remindersPerDay > 1 {
