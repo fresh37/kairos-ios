@@ -189,7 +189,7 @@ enum NotificationScheduler {
                 let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
                 let trigger    = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
                 let content    = UNMutableNotificationContent()
-                content.body   = messages[index % messages.count]
+                content.body   = "🧘 \(messages[index % messages.count])"
                 content.sound  = .default
 
                 let request = UNNotificationRequest(

@@ -188,7 +188,7 @@ extension Color {
 struct SettingsGroup<Content: View>: View {
     @Environment(\.appTheme) private var theme
     let label: String
-    var infoAction: (() -> Void)? = nil
+    var infoAction: (() -> Void)?
     @ViewBuilder let content: () -> Content
 
     var body: some View {

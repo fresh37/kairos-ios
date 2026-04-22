@@ -32,29 +32,22 @@ enum MessagePool {
         "Soften your shoulders. Let them drop gently.",
         "Unclench your jaw. Notice the release.",
         "Feel your feet flat on the ground.",
-        "Is your breathing shallow? Slow it down.",
         "Relax the muscles around your eyes.",
         "Gently roll your shoulders back and down.",
         "Where do you feel most tense?",
         "Take three slow breaths before moving on.",
         "Notice areas of tension in your body.",
-        "Slowly scan from your head to toe.",
-        "Feel where your body begins and ends."
+        "Slowly scan from your head to toe."
     ]
 
     static let presentMoment: [String] = [
         "What three things can you see now?",
         "What sounds are present in this moment?",
-        "Right now, this moment is enough.",
-        "Come back. You are here, right now.",
-        "What can you feel against your skin?",
-        "Look up from your screen right now.",
+        "Come back to the present.",
         "Nothing needs your attention for sixty seconds.",
         "Notice the space around you right now.",
         "Let this moment be what it is.",
-        "Step out of your head. Land here.",
         "What is happening right now around you?",
-        "The present is where your life is.",
         "Put the future down for one breath.",
         "What texture can you feel right now?",
         "Notice the light in the room now."
@@ -65,16 +58,10 @@ enum MessagePool {
         "Sit still for one minute. Just breathe.",
         "Set a timer for five minutes. Meditate.",
         "Notice the rise and fall of your breath.",
-        "Let your thoughts pass like clouds.",
-        "Bring your full attention to this moment.",
         "Breathe in for four counts, out for four.",
-        "Allow yourself to simply be right now.",
         "Observe without judgment for one minute.",
         "Rest your attention gently on your breath.",
-        "Nothing to do. Nowhere to be. Just breathe.",
         "Soften your gaze. Slow your breathing down.",
-        "Pause everything. Just sit and breathe.",
-        "Release effort. Just notice what is here.",
         "You have permission to stop and breathe."
     ]
 }

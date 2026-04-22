@@ -80,7 +80,7 @@ struct SettingsDrawer: View {
                         }
 
                         // Schedule
-                        SettingsGroup(label: "Schedule", infoAction: { showScheduleInfo = true }) {
+                        SettingsGroup(label: "Schedule", infoAction: { showScheduleInfo = true }, content: {
                             pickerRow(label: "Start",
                                       selection: $draft.startHour,
                                       values: Array(1...23))
@@ -90,7 +90,7 @@ struct SettingsDrawer: View {
                                       values: Array(2...24))
                             rowDivider
                             daysRow(activeDays: $draft.activeDays)
-                        }
+                        })
 
                         // Categories
                         SettingsGroup(label: "Categories") {
@@ -160,7 +160,10 @@ struct SettingsDrawer: View {
             .alert("About Your Schedule", isPresented: $showScheduleInfo) {
                 Button("Got it") { }
             } message: {
-                Text("Notifications are spread naturally across your schedule window, so they arrive at varied times rather than all at once.")
+                Text(
+                    "Notifications are spread naturally across your schedule window, " +
+                    "so they arrive at varied times rather than all at once."
+                )
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)

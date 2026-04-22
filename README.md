@@ -1,8 +1,8 @@
 # Checkpoint
 
-A mindfulness and habit-tracking iOS app. Scheduled notifications deliver brief breathing moments throughout the day; a savings-based habit tracker helps build routines toward a personal goal.
+A mindfulness and habit-tracking iOS app. Scheduled notifications deliver prompts to pause throughout the day; a savings-based habit tracker helps build routines toward a personal goal. No internet connection needed, completely free, and no data collected.
 
-*Brief pauses, delivered throughout your day. Nothing to remember. Nothing to open.*
+Now on the App Store! https://apps.apple.com/us/app/checkpoint-mindful-habits/id6761188718
 
 ## Features
 
@@ -27,8 +27,6 @@ A mindfulness and habit-tracking iOS app. Scheduled notifications deliver brief 
 - Set savings goals and attach habits with monetary rewards
 - Log completions to earn progress toward the goal
 - Habit Loop support (cue, craving) based on habit formation science
-- Completion history grouped by day — makes accidental duplicates visible at a glance
-- Goal completion celebration with animations
 - Habits carry over automatically when starting a new goal
 
 ### Appearance

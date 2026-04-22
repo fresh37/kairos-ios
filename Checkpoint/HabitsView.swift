@@ -10,6 +10,7 @@
 
 import SwiftData
 import SwiftUI
+import UIKit
 
 struct HabitsView: View {
     @Query(filter: #Predicate<HabitGoal> { $0.isActive })
@@ -23,6 +24,9 @@ struct HabitsView: View {
     @State private var showResetConfirmation = false
     @State private var showHistory = false
     @State private var habitToEdit: Habit?
+    @State private var completingHabitID: UUID?
+    @State private var progressPulse = false
+    @State private var shimmerPhase: CGFloat = 0
 
     private var activeGoal: HabitGoal? { activeGoals.first }
 
@@ -118,8 +122,11 @@ struct HabitsView: View {
                     habitRow(habit, goal: goal)
                         .listRowBackground(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(.white.opacity(0.05))
+                                .fill(completingHabitID == habit.id
+                                    ? theme.accent.opacity(0.18)
+                                    : .white.opacity(0.05))
                                 .padding(.vertical, 0.5)
+                                .animation(.easeOut(duration: 0.15), value: completingHabitID)
                         )
                         .listRowInsets(EdgeInsets(top: 0.5, leading: 20, bottom: 0.5, trailing: 20))
                         .listRowSeparator(.hidden)
@@ -189,25 +196,7 @@ struct HabitsView: View {
             Text(goal.name)
                 .font(.system(size: 20, weight: .medium))
                 .foregroundColor(.white)
-
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(.white.opacity(0.1))
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(
-                            LinearGradient(
-                                colors: [theme.accent, theme.accentDeep],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: geo.size.width * goal.progress)
-                        .animation(.spring(duration: 0.5), value: goal.currentCents)
-                }
-            }
-            .frame(height: 10)
-
+            ProgressBarTrack(goal: goal, theme: theme, progressPulse: progressPulse, shimmerPhase: shimmerPhase)
             HStack {
                 Text(goal.formattedCurrent)
                     .contentTransition(.numericText())
@@ -240,18 +229,43 @@ struct HabitsView: View {
                 Spacer()
                 Text("+\(habit.formattedReward)")
                     .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundColor(theme.accent)
+                    .foregroundColor(completingHabitID == habit.id ? .white : theme.accent)
+                    .scaleEffect(completingHabitID == habit.id ? 1.1 : 1.0)
+                    .animation(.spring(response: 0.25, dampingFraction: 0.55), value: completingHabitID)
             }
             .padding(.vertical, 14)
             .padding(.horizontal, 16)
         }
+        .buttonStyle(HabitRowButtonStyle())
     }
 
     // MARK: - Completion
 
     private func completeHabit(_ habit: Habit, goal: HabitGoal) {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+
+        withAnimation(.easeOut(duration: 0.12)) {
+            completingHabitID = habit.id
+        }
+
         let completion = HabitCompletion(amountCents: habit.rewardCents, habit: habit)
         modelContext.insert(completion)
+
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.5)) {
+            progressPulse = true
+        }
+
+        shimmerPhase = 0
+        withAnimation(.easeOut(duration: 0.65).delay(0.08)) {
+            shimmerPhase = 1.2
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.38) {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                completingHabitID = nil
+                progressPulse = false
+            }
+        }
 
         if goal.currentCents >= goal.targetCents {
             withAnimation(.easeInOut(duration: 0.55)) {
@@ -269,5 +283,60 @@ struct HabitsView: View {
 
     private func renumberOrder(goal: HabitGoal) {
         for (index, habit) in sorted(goal.habits).enumerated() { habit.order = index }
+    }
+}
+
+// MARK: - Supporting types
+
+private struct ProgressBarTrack: View {
+    let goal: HabitGoal
+    let theme: AppTheme
+    let progressPulse: Bool
+    let shimmerPhase: CGFloat
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(.white.opacity(0.1))
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(
+                        LinearGradient(
+                            colors: [theme.accent, theme.accentDeep],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: geo.size.width * goal.progress)
+                    .animation(.spring(response: 0.45, dampingFraction: 0.62), value: goal.currentCents)
+                    .shadow(color: theme.glowColor.opacity(progressPulse ? 0.55 : 0), radius: 6, x: 0, y: 0)
+                    .animation(.easeOut(duration: 0.5), value: progressPulse)
+                    .overlay(
+                        GeometryReader { fillGeo in
+                            let shimmerWidth: CGFloat = 50
+                            Rectangle()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [.clear, .white.opacity(0.45), .clear],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .frame(width: shimmerWidth)
+                                .offset(x: (shimmerPhase * (fillGeo.size.width + shimmerWidth)) - shimmerWidth)
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                    )
+            }
+        }
+        .frame(height: 10)
+    }
+}
+
+private struct HabitRowButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
